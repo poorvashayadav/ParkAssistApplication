@@ -10,10 +10,10 @@ pool:
   vmImage: 'windows-2019'
 
 stages:
-- stage: Maven_Build
+- stage: Maven_Compile
   jobs:
-  - job: Maven_Build_Job
-    displayName: 'Compile Java code'
+  - job: Maven_Compile_Job
+    displayName: 'Compile ADAS-Park Assist App Code'
     steps:
     - task: Maven@3
       inputs:
