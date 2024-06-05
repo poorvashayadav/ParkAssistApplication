@@ -20,7 +20,7 @@ stages:
         mavenPomFile: 'pom.xml'
         goals: 'compile'
         javaHomeOption: 'JDKVersion'
-        jdkVersionOption: default
+        jdkVersionOption: 1.8
         mavenVersionOption: 'Default'
         mavenOptions: '-Xmx3072m'
         mavenAuthenticateFeed: false
