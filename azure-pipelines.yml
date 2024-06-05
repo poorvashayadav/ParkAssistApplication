@@ -10,17 +10,41 @@ pool:
   vmImage: 'windows-2019'
 
 stages:
-- stage: Maven_Compile
+- stage: Maven Compile & Sonar Scan
   jobs:
-  - job: Maven_Compile_Job
+  - job: Maven Compile Job
     displayName: 'Compile ADAS-Park Assist App Code'
     steps:
     - task: Maven@3
       inputs:
         mavenPomFile: 'pom.xml'
         goals: 'compile'
+        publishJUnitResults: true
+        testResultsFiles: '**/surefire-reports/TEST-*.xml'
         javaHomeOption: 'JDKVersion'
-        jdkVersionOption: 1.17
+        jdkVersionOption: '1.17'
+        mavenVersionOption: 'Default'
+        mavenOptions: '-Xmx3072m'
+        mavenAuthenticateFeed: false
+        effectivePomSkip: false
+        sonarQubeRunAnalysis: true
+        sqMavenPluginVersionChoice: 'latest'
+    - task: Bash@3
+      displayName: 'Set SonarQube Environment Variables'
+      inputs:
+        targetType: 'inline'
+        script: |
+          echo "##vso[task.setvariable variable=SONAR_HOST_URL]$(SONAR_HOST_URL)"
+          echo "##vso[task.setvariable variable=SONAR_TOKEN]$(SONAR_TOKEN)"
+
+    - task: Maven@3
+      displayName: 'Run SonarQube Analysis'
+      inputs:
+        mavenPomFile: 'pom.xml'
+        goals: 'verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar'
+        options: '-Dsonar.host.url=$(SONAR_HOST_URL) -Dsonar.login=$(SONAR_TOKEN)'
+        javaHomeOption: 'JDKVersion'
+        jdkVersionOption: '1.17'
         mavenVersionOption: 'Default'
         mavenOptions: '-Xmx3072m'
         mavenAuthenticateFeed: false
