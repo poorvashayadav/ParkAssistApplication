@@ -1,8 +1,3 @@
-# Maven
-# Build your Java project and run tests with Apache Maven.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/java
-
 trigger:
 - master
 
@@ -17,16 +12,7 @@ stages:
   jobs:
   - job: Maven_Compile_Job
     displayName: 'Compile ADAS-Park Assist App Code'
-    
     steps:
-     
-    - task: Bash@3
-      displayName: 'Set SonarQube Environment Variables'
-      inputs:
-        targetType: 'inline'
-        script: |
-          echo "##vso[task.setvariable variable=SONAR_HOST_URL]$(http://10.0.0.5:9000)"
-          echo "##vso[task.setvariable variable=SONAR_TOKEN]$(sqa_02ebdcff5e178d716a81ecc3f11b18a71c2af569)"
     - task: Maven@3
       inputs:
         mavenPomFile: 'pom.xml'
@@ -42,15 +28,21 @@ stages:
         sonarQubeRunAnalysis: true
         sqMavenPluginVersionChoice: 'latest'
 
-    - task: Maven@3
-      displayName: 'Run SonarQube Analysis'
+- stage: Test
+  jobs:
+  - job: codebeamer_test_run
+    displayName: "upload test cases to codebeamer"
+    steps:
+    - script: |
+        echo "Empty job."
+    - task: codeBeamer@1
       inputs:
-        mavenPomFile: 'pom.xml'
-        goals: 'verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar'
-        options: '-Dsonar.host.url=$(SONAR_HOST_URL) -Dsonar.login=$(SONAR_TOKEN)'
-        javaHomeOption: 'JDKVersion'
-        jdkVersionOption: '1.17'
-        mavenVersionOption: 'Default'
-        mavenOptions: '-Xmx3072m'
-        mavenAuthenticateFeed: false
-        effectivePomSkip: false
+        test_xml_folder: 'CodeBeamer/test_results'
+        test_run_name: '$(Build.DefinitionName) $(Build.Reason)'
+        test_run_id: '$(Build.BuildId)'
+        server_url: 'http://20.198.16.233:8080/'
+        cb_user: '$(cb_user)'
+        cb_password: '$(cb_password)'
+        test_configuration_id: '71301'
+        test_case_tracker_id: '71334'
+        test_run_tracker_id: '71302'
