@@ -9,6 +9,9 @@ trigger:
 pool:
   vmImage: 'windows-2019'
 
+variables:
+  - group: secrets
+
 stages:
 - stage: Maven_And_Analysis
   jobs:
