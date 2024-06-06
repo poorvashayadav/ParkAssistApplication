@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuite name="My Main Test Case" tests="0" skipped="0" failures="0" errors="0" timestamp="" hostname="" time="">
     <properties/>
-    <testcase name="[REFERENCE:19316] mainTest1" classname="MainTest" subjects="19316" time=""/>
+    <testcase name="[REFERENCE:19316] mainTest1" classname="MainTest" subjects="19316" time="">
         <teststep>This is a placeholder test step for mainTest1</teststep>
     </testcase>
     <testcase name="mainTest2" classname="My Main Test Case" time="">
