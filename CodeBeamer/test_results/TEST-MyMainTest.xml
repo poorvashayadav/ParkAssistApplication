@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="My Main Test Case" tests="0" skipped="0" failures="0" errors="0" timestamp="" hostname="" time="">
+  <properties/>
+  <testcase name="mainTest1" classname="My Main Test Case" time="">
+  <teststep>This is a placeholder test step for mainTest1</teststep>
+  </testcase>
+  <testcase name="mainTest2" classname="My Main Test Case" time="">
+    <teststep>This is a placeholder test step for mainTest2</teststep>
+  </testcase>
+  <testcase name="mainTest3" classname="My Main Test Case" time="">
+    <teststep>This is a placeholder test step for mainTest3</teststep>
+  </testcase>
+  <testcase name="mainTest4" classname="My Main Test Case" time="">
+    <teststep>This is a placeholder test step for mainTest4</teststep>
+  </testcase>
+  <testcase name="mainTest5" classname="My Main Test Case" time="">
+    <teststep>This is a placeholder test step for mainTest5</teststep>
+  </testcase>
+  
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
