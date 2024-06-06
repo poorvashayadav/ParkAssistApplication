@@ -1,5 +1,9 @@
-trigger:
-- master
+trigger: none  # Disables automatic triggering
+
+pr: 
+  branches:
+    include:
+      - '*'
 
 pool:
   vmImage: 'windows-2019'
