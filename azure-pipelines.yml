@@ -41,6 +41,6 @@ stages:
         server_url: 'http://20.198.16.233:8080/'
         cb_user: '$(cb_user)'
         cb_password: '$(cb_password)'
-        test_configuration_id: '71301'
-        test_case_tracker_id: '71334'
+        test_configuration_id: '19332'
+        test_case_tracker_id: '98809'
         test_run_tracker_id: '71302'
