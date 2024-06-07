@@ -30,7 +30,7 @@ stages:
 
     - task: SonarQubePrepare@4
       inputs:
-        SonarQube: 'SonarQubeServiceConnection'  # Name of the SonarQube service connection
+        SonarQube: 'Sonar_Connect'  # Name of the SonarQube service connection
         scannerMode: 'CLI'
         configMode: 'manual'
         cliProjectKey: 'ADAS'
