@@ -15,6 +15,10 @@ stages:
   - job: Maven_Compile_Job
     displayName: 'Compile ADAS-Park Assist App Code'
     steps:
+    - script: |
+        mvn clean
+        mvn dependency:tree
+      displayName: 'Clean and Analyze Dependencies'
 
     - task: Maven@3
       inputs:
