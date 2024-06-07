@@ -1,9 +1,7 @@
-trigger: none  # Disables automatic triggering
-
-pr: 
+trigger:
   branches:
     include:
-      - '*'
+      - master 
 
 pool:
   vmImage: 'windows-2019'
@@ -17,6 +15,7 @@ stages:
   - job: Maven_Compile_Job
     displayName: 'Compile ADAS-Park Assist App Code'
     steps:
+
     - task: Maven@3
       inputs:
         mavenPomFile: 'pom.xml'
@@ -28,23 +27,26 @@ stages:
         mavenOptions: '-Xmx3072m'
         mavenAuthenticateFeed: false
         effectivePomSkip: false
-        sonarQubeRunAnalysis: false
 
-- stage: Test
-  jobs:
-  - job: codebeamer_test_run
-    displayName: "upload test cases to codebeamer"
-    steps:
-    - script: |
-        echo "Empty job."
-    - task: codeBeamer@1
+    - task: SonarQubePrepare@4
       inputs:
-        test_xml_folder: 'CodeBeamer/test_results'
-        test_run_name: '$(Build.DefinitionName) $(Build.Reason)'
-        test_run_id: '$(Build.BuildId)'
-        server_url: 'http://20.198.16.233:8080/'
-        cb_user: '$(cb_user)'
-        cb_password: '$(cb_password)'
-        test_configuration_id: '19332'
-        test_case_tracker_id: '98809'
-        test_run_tracker_id: '71302'
+        SonarQube: 'SonarQubeServiceConnection'  # Name of the SonarQube service connection
+        scannerMode: 'CLI'
+        configMode: 'manual'
+        cliProjectKey: 'ADAS'
+        cliProjectName: 'ADAS'
+        extraProperties: |
+          sonar.exclusions=**/*.bin
+
+    - task: Maven@3
+      inputs:
+        mavenPomFile: 'pom.xml'
+        goals: 'verify sonar:sonar'
+        publishJUnitResults: true
+        testResultsFiles: '**/surefire-reports/TEST-*.xml'
+        javaHomeOption: 'JDKVersion'
+        jdkVersionOption: '1.17'
+        mavenVersionOption: 'Default'
+        mavenOptions: '-Xmx3072m'
+        mavenAuthenticateFeed: false
+        effectivePomSkip: false
