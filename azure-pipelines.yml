@@ -10,7 +10,7 @@ variables:
   - group: secrets
 
 stages:
-- stage: Maven_And_Analysis
+- stage: Maven_And_Sonar_Analysis
   jobs:
   - job: Maven_Compile_Job
     displayName: 'Compile ADAS-Park Assist App Code'
@@ -54,3 +54,27 @@ stages:
         mavenOptions: '-Xmx3072m'
         mavenAuthenticateFeed: false
         effectivePomSkip: false
+- stage: Test
+  jobs:
+  - job: codebeamer_test_run
+    displayName: "Upload test cases to Codebeamer"
+    steps:
+    - script: |
+        echo "##vso[task.debug]Logging enabled"
+      displayName: 'Enable Debug Logging'
+    
+    - script: |
+        echo "Running test and uploading results to Codebeamer"
+      displayName: 'Preparation Step'
+    
+    - task: codeBeamer@1
+      inputs:
+        test_xml_folder: 'CodeBeamer/test_results'
+        test_run_name: '$(Build.DefinitionName) $(Build.Reason)'
+        test_run_id: '$(Build.BuildId)'
+        server_url: 'http://20.198.16.233:8080/'
+        cb_user: '$(cb_user)'
+        cb_password: '$(cb_password)'
+        test_configuration_id: '19332'
+        test_case_tracker_id: '98809'
+        test_run_tracker_id: '71302'
