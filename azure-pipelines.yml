@@ -11,9 +11,9 @@ variables:
   - group: secrets
 
 stages:
-- stage: Maven_And_Sonar_Analysis
+- stage: Maven_And_Sonar_Analysis 
   jobs:
-  - job: Maven_Compile_Job
+  - job: Maven_Compile_Job # Added Maven Job for compiling Code
     displayName: 'Compile ADAS-Park Assist App Code'
     steps:
     - script: |
