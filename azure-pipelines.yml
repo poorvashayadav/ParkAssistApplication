@@ -13,7 +13,7 @@ variables:
 stages:
 - stage: Maven_And_Sonar_Analysis 
   jobs:
-  - job: Maven_Compile_Job # Added Maven Job for compiling Code
+  - job: Maven_Compile_Job # Added Maven Job for code compilation
     displayName: 'Compile ADAS-Park Assist App Code'
     steps:
     - script: |
