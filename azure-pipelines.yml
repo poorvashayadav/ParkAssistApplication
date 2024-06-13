@@ -32,8 +32,8 @@ stages:
         mavenOptions: '-Xmx3072m'
         mavenAuthenticateFeed: false
         effectivePomSkip: false
-
     - task: SonarQubePrepare@4
+      displayName: 'SonarQube Analysis'
       inputs:
         SonarQube: 'Sonar_Connect'  # Name of the SonarQube service connection
         scannerMode: 'CLI'
@@ -43,7 +43,9 @@ stages:
         extraProperties: |
           sonar.exclusions=**/*.bin
 
+
     - task: Maven@3
+      displayName: 'Test Run'
       inputs:
         mavenPomFile: 'pom.xml'
         goals: 'verify sonar:sonar'
@@ -55,27 +57,3 @@ stages:
         mavenOptions: '-Xmx3072m'
         mavenAuthenticateFeed: false
         effectivePomSkip: false
-- stage: Test
-  jobs:
-  - job: codebeamer_test_run
-    displayName: "Upload test cases to Codebeamer"
-    steps:
-    - script: |
-        echo "##vso[task.debug]Logging enabled"
-      displayName: 'Enable Debug Logging'
-    
-    - script: |
-        echo "Running test and uploading results to Codebeamer"
-      displayName: 'Preparation Step'
-    
-    - task: codeBeamer@1
-      inputs:
-        test_xml_folder: 'CodeBeamer/test_results'
-        test_run_name: '$(Build.DefinitionName) $(Build.Reason)'
-        test_run_id: '$(Build.BuildId)'
-        server_url: 'http://20.198.16.233:8080/cb/rest/xunitresults'
-        cb_user: '$(cb_user)'
-        cb_password: '$(cb_password)'
-        test_configuration_id: '19332'
-        test_case_tracker_id: '98809'
-        test_run_tracker_id: '71302'
