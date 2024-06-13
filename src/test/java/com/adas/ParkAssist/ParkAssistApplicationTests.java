@@ -8,10 +8,11 @@ class ParkAssistApplicationTests {
 
 	@Test
 	void contextLoads() {
+	// This is a fake test case with no logic(Test 1)
 	}
 	@Test
     	void fakeTestOne() {
-        // This is a fake test case with no logic
+        // This is a fake test case with no logic(Test 2)
         assert true;
     	}
 
