@@ -2,12 +2,17 @@ import os
 import json
 import urllib.request
 from urllib.error import HTTPError
+import base64
 
 # Directory where test case JSON files are stored
 test_cases_directory = "Codebeamer/testresults/test_cases"
 
 # URL of the server endpoint to add test cases
 url = "http://20.198.16.233:8080/cb/rest/item"
+
+# Credentials for Basic Authentication
+username = "poorvashayadav"
+password = "poorvasha.yadav"
 
 # Function to read JSON data from a file
 def read_json(file_path):
@@ -16,6 +21,12 @@ def read_json(file_path):
 
 # Main function to add test cases
 def add_test_cases():
+    # Encode credentials for Basic Authentication
+    auth_string = f"{username}:{password}"
+    auth_bytes = auth_string.encode('utf-8')
+    base64_bytes = base64.b64encode(auth_bytes)
+    base64_auth_string = base64_bytes.decode('utf-8')
+
     # Iterate over each JSON file in the directory
     for filename in os.listdir(test_cases_directory):
         if filename.endswith('.json'):
@@ -24,7 +35,10 @@ def add_test_cases():
             
             # Prepare request data
             data = json.dumps(test_case).encode('utf-8')
-            headers = {'Content-Type': 'application/json'}
+            headers = {
+                'Content-Type': 'application/json',
+                'Authorization': f'Basic {base64_auth_string}'
+            }
             req = urllib.request.Request(url, data=data, headers=headers, method='POST')
             
             try:
