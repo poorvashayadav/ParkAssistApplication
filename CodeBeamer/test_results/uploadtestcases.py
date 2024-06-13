@@ -4,8 +4,14 @@ import urllib.request
 from urllib.error import HTTPError
 import base64
 
+# Get the directory path of the current script
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Construct the path to the test cases directory
+test_cases_directory = os.path.join(script_dir, 'CodeBeamer', 'test_results', 'test_cases')
+
 # Directory where test case JSON files are stored
-test_cases_directory = "Codebeamer/test_results/test_cases"
+#test_cases_directory = "Codebeamer/test_results/test_cases"
 
 # URL of the server endpoint to add test cases
 url = "http://20.198.16.233:8080/cb/rest/item"
