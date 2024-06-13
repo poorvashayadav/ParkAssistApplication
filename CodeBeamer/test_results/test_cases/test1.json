@@ -1,0 +1,9 @@
+{
+  "name": "Test dimmer at minimum brightness",
+  "tracker": "/project/39/tracker/98809",
+  "steps": [
+    "Turn the on/off switch to the 'on' position.",
+    "Turn the switch to the left until it stops.",
+    "Observe the light brightness level."
+  ]
+}
