@@ -73,7 +73,7 @@ stages:
         test_xml_folder: 'CodeBeamer/test_results'
         test_run_name: '$(Build.DefinitionName) $(Build.Reason)'
         test_run_id: '$(Build.BuildId)'
-        server_url: 'http://20.198.16.233:8080/cb'
+        server_url: 'http://20.198.16.233:8080/cb/rest/xunitresults'
         cb_user: '$(cb_user)'
         cb_password: '$(cb_password)'
         test_configuration_id: '19332'
