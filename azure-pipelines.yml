@@ -1,10 +1,8 @@
-# Maven
-# Build your Java project and run tests with Apache Maven.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/java
-
-trigger:
-- master
+trigger: none
+pr:
+  branches:
+    include:
+      - master
 
 pool:
   vmImage: 'windows-2019'
@@ -13,41 +11,46 @@ variables:
   - group: secrets
 
 stages:
-- stage: Maven_And_Analysis
+- stage: Maven_And_Sonar_Analysis 
   jobs:
-  - job: Maven_Compile_Job
+  - job: Maven_Compile_Job # Added Maven Job for code compilation
     displayName: 'Compile ADAS-Park Assist App Code'
-    
     steps:
-     
-    - task: Bash@3
-      displayName: 'Set SonarQube Environment Variables'
-      inputs:
-        targetType: 'inline'
-        script: |
-          echo "##vso[task.setvariable variable=SONAR_HOST_URL]$(http://10.0.0.5:9000)"
-          echo "##vso[task.setvariable variable=SONAR_TOKEN]$(sqa_02ebdcff5e178d716a81ecc3f11b18a71c2af569)"
+    - script: |
+        mvn clean
+        mvn dependency:tree
+      displayName: 'Clean and Analyze Dependencies'
+
     - task: Maven@3
       inputs:
         mavenPomFile: 'pom.xml'
         goals: 'compile'
-        publishJUnitResults: true
-        testResultsFiles: '**/surefire-reports/TEST-*.xml'
+        publishJUnitResults: false
         javaHomeOption: 'JDKVersion'
         jdkVersionOption: '1.17'
         mavenVersionOption: 'Default'
         mavenOptions: '-Xmx3072m'
         mavenAuthenticateFeed: false
         effectivePomSkip: false
-        sonarQubeRunAnalysis: true
-        sqMavenPluginVersionChoice: 'latest'
+    - task: SonarQubePrepare@4
+      displayName: 'SonarQube Analysis'
+      inputs:
+        SonarQube: 'Sonar_Connect'  # Name of the SonarQube service connection
+        scannerMode: 'CLI'
+        configMode: 'manual'
+        cliProjectKey: 'ADAS'
+        cliProjectName: 'ADAS'
+        extraProperties: |
+          sonar.exclusions=**/*.bin
+
 
     - task: Maven@3
-      displayName: 'Run SonarQube Analysis'
+      displayName: 'Test Run'
       inputs:
         mavenPomFile: 'pom.xml'
-        goals: 'verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar'
-        options: '-Dsonar.host.url=$(SONAR_HOST_URL) -Dsonar.login=$(SONAR_TOKEN)'
+        goals: 'verify sonar:sonar'
+        publishJUnitResults: true
+        testResultsFiles: '**/surefire-reports/TEST-*.xml'
         javaHomeOption: 'JDKVersion'
         jdkVersionOption: '1.17'
         mavenVersionOption: 'Default'

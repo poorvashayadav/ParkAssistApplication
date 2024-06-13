@@ -14,8 +14,14 @@
 	<name>ParkAssist</name>
 	<description>Park Assist</description>
 	<properties>
-    		<java.version>17</java.version>
-	</properties>
+        <java.version>17</java.version>
+        <sonar.projectKey>ADAS</sonar.projectKey>
+        <sonar.projectName>ADAS</sonar.projectName>
+        <sonar.sources>src/main/java</sonar.sources>
+        <sonar.tests>src/test/java</sonar.tests>
+        <sonar.test.inclusions>**/*Test.java,**/*Tests.java</sonar.test.inclusions>
+        <sonar.exclusions>src/test/java/**</sonar.exclusions>
+    	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -35,6 +41,11 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+               			 <groupId>org.sonarsource.scanner.maven</groupId>
+               			 <artifactId>sonar-maven-plugin</artifactId>
+               			 <version>3.9.1.2184</version>
+            		</plugin>
 		</plugins>
 	</build>
 
