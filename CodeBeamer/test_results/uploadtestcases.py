@@ -5,7 +5,7 @@ from urllib.error import HTTPError
 import base64
 
 # Directory where test case JSON files are stored
-test_cases_directory = "Codebeamer/testresults/test_cases"
+test_cases_directory = "Codebeamer/test_results/test_cases"
 
 # URL of the server endpoint to add test cases
 url = "http://20.198.16.233:8080/cb/rest/item"
