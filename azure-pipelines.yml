@@ -57,14 +57,16 @@ stages:
         mavenOptions: '-Xmx3072m'
         mavenAuthenticateFeed: false
         effectivePomSkip: false
+
 - stage: Test
-  displayName: 'Run Python Script'
+  displayName: 'Test'
   jobs:
   - job: RunPythonScript
-    pool:
-      vmImage: 'ubuntu-latest'
     steps:
-    - task: PythonScript@0
+    - checkout: self
+    - script: |
+        python CodeBeamer/test_results/uploadtestcases.py
       displayName: 'Run Python Script'
-      inputs:
-        scriptPath: 'CodeBeamer/test_results/uploadtestcases.py'
+      env:
+        cb_user: $(cb_user)
+        cb_password: $(cb_password)
