@@ -57,6 +57,11 @@ stages:
         mavenOptions: '-Xmx3072m'
         mavenAuthenticateFeed: false
         effectivePomSkip: false
+    - task: CopyFiles@2
+      displayName: 'Copy Files to Artifact Staging Directory'
+      inputs:
+        contents: '**/target/**/*'
+        targetFolder: '$(Build.ArtifactStagingDirectory)'   
 
 - stage: Test
   displayName: 'Test'
