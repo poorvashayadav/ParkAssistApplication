@@ -13,15 +13,18 @@ variables:
 stages:
 - stage: Maven_And_Sonar_Analysis 
   jobs:
-  - job: Maven_Compile_Job # Added Maven Job for code compilation
+  - job: Maven_Compile_Job
     displayName: 'Compile ADAS-Park Assist App Code'
     steps:
+    - checkout: self  # Ensure the repository is checked out
+
     - script: |
         mvn clean
         mvn dependency:tree
       displayName: 'Clean and Analyze Dependencies'
 
     - task: Maven@3
+      displayName: 'Maven Compile'
       inputs:
         mavenPomFile: 'pom.xml'
         goals: 'compile'
@@ -32,17 +35,17 @@ stages:
         mavenOptions: '-Xmx3072m'
         mavenAuthenticateFeed: false
         effectivePomSkip: false
+
     - task: SonarQubePrepare@4
       displayName: 'SonarQube Analysis'
       inputs:
-        SonarQube: 'Sonar_Connect'  # Name of the SonarQube service connection
+        SonarQube: 'Sonar_Connect'
         scannerMode: 'CLI'
         configMode: 'manual'
         cliProjectKey: 'ADAS'
         cliProjectName: 'ADAS'
         extraProperties: |
           sonar.exclusions=**/*.bin
-
 
     - task: Maven@3
       displayName: 'Test Run'
@@ -57,18 +60,25 @@ stages:
         mavenOptions: '-Xmx3072m'
         mavenAuthenticateFeed: false
         effectivePomSkip: false
+
     - task: CopyFiles@2
       displayName: 'Copy Files to Artifact Staging Directory'
       inputs:
         contents: '**/target/**/*'
-        targetFolder: '$(Build.ArtifactStagingDirectory)'   
+        targetFolder: '$(Build.ArtifactStagingDirectory)'
+
+    - script: |
+        echo "Contents of $(Build.ArtifactStagingDirectory):"
+        ls -R $(Build.ArtifactStagingDirectory)
+      displayName: 'List Artifact Staging Directory Contents'
 
 - stage: Test
   displayName: 'Test'
   jobs:
   - job: RunPythonScript
     steps:
-    - checkout: self
+    - checkout: self  # Ensure the repository is checked out
+
     - script: |
         python CodeBeamer/test_results/uploadtestcases.py
       displayName: 'Run Python Script'
