@@ -70,3 +70,18 @@ stages:
       env:
         cb_user: $(cb_user)
         cb_password: $(cb_password)
+        
+- stage: PublishArtifacts
+  displayName: 'Publish Build Artifacts'
+  jobs:
+  - job: Publish
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Build Artifacts'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
+        StoreAsTar: true
