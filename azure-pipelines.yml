@@ -71,6 +71,15 @@ stages:
         echo "Contents of $(Build.ArtifactStagingDirectory):"
         ls -R $(Build.ArtifactStagingDirectory)
       displayName: 'List Artifact Staging Directory Contents'
+      
+  - job: Publish_Build_Artifact
+    steps:
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Build Artifacts'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
 
 - stage: Test
   displayName: 'Test'
@@ -86,14 +95,4 @@ stages:
         cb_user: $(cb_user)
         cb_password: $(cb_password)
 
-- stage: PublishArtifacts
-  displayName: 'Publish Build Artifacts'
-  jobs:
-  - job: Publish
-    steps:
-    - task: PublishBuildArtifacts@1
-      displayName: 'Publish Build Artifacts'
-      inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'drop'
-        publishLocation: 'Container'
+
