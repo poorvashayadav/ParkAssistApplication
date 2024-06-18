@@ -80,6 +80,12 @@ stages:
         effectivePomSkip: false
         sonarQubeRunAnalysis: false
 
+    # Verify Maven build output
+    - script: |
+        echo "Contents of the target directory after build:"
+        ls -R target
+      displayName: 'List Target Directory Contents'
+
     # Copy files to artifact staging directory
     - task: CopyFiles@2
       displayName: 'Copy Files to Artifact Staging Directory'
@@ -103,18 +109,18 @@ stages:
         ArtifactName: 'drop'
         publishLocation: 'Container'
 
-- stage: Test
-  displayName: 'Test'
-  jobs:
-  - job: RunPythonScript
-    steps:
-    - checkout: self  # Ensure the repository is checked out
-
-    - script: |
-        python CodeBeamer/test_results/uploadtestcases.py
-      displayName: 'Run Python Script'
-      env:
-        cb_user: $(cb_user)
-        cb_password: $(cb_password)
+#- stage: Test
+#  displayName: 'Test'
+#  jobs:
+#  - job: RunPythonScript
+#    steps:
+#    - checkout: self  # Ensure the repository is checked out
+#
+#    - script: |
+#        python CodeBeamer/test_results/uploadtestcases.py
+#      displayName: 'Run Python Script'
+#     env:
+#        cb_user: $(cb_user)
+#        cb_password: $(cb_password)
 
 
