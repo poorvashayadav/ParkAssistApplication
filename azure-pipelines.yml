@@ -11,110 +11,140 @@ variables:
   - group: secrets
 
 stages:
-- stage: Maven_And_Sonar_Analysis
-  jobs:
-  - job: Build_And_Publish
-    displayName: 'Build, Analyze, and Publish ADAS-Park Assist App Code'
-    steps:
-    - checkout: self  # Ensure the repository is checked out
+  # Stage 1: Checkout and Dependency Analysis
+  - stage: Checkout_And_Analyze
+    displayName: 'Checkout and Analyze Dependencies'
+    jobs:
+    - job: Checkout_And_Analyze
+      displayName: 'Checkout and Analyze Dependencies'
+      steps:
+      - checkout: self  # Ensure the repository is checked out
 
-    # Clean and analyze dependencies
-    - script: |
-        mvn clean
-        mvn dependency:tree
-      displayName: 'Clean and Analyze Dependencies'
+      - script: |
+          mvn clean
+          mvn dependency:tree
+        displayName: 'Clean and Analyze Dependencies'
 
-    # Compile the code
-    - task: Maven@3
-      displayName: 'Maven Compile'
-      inputs:
-        mavenPomFile: 'pom.xml'
-        goals: 'compile'
-        publishJUnitResults: false
-        javaHomeOption: 'JDKVersion'
-        jdkVersionOption: '1.17'
-        mavenVersionOption: 'Default'
-        mavenOptions: '-Xmx3072m'
-        mavenAuthenticateFeed: false
-        effectivePomSkip: false
+  # Stage 2: Build and SonarQube Analysis
+  - stage: Build_And_SonarQube
+    displayName: 'Build and SonarQube Analysis'
+    dependsOn: Checkout_And_Analyze
+    jobs:
+    - job: Build_And_SonarQube
+      displayName: 'Build and SonarQube Analysis'
+      steps:
+      # Compile the code
+      - task: Maven@3
+        displayName: 'Maven Compile'
+        inputs:
+          mavenPomFile: 'pom.xml'
+          goals: 'compile'
+          publishJUnitResults: false
+          javaHomeOption: 'JDKVersion'
+          jdkVersionOption: '1.17'
+          mavenVersionOption: 'Default'
+          mavenOptions: '-Xmx3072m'
+          mavenAuthenticateFeed: false
+          effectivePomSkip: false
 
-    # Prepare for SonarQube analysis
-    - task: SonarQubePrepare@4
-      displayName: 'Prepare SonarQube Analysis'
-      inputs:
-        SonarQube: 'Sonar_Connect'
-        scannerMode: 'CLI'
-        configMode: 'manual'
-        cliProjectKey: 'ADAS'
-        cliProjectName: 'ADAS'
-        extraProperties: |
-          sonar.exclusions=**/*.bin
+      # Prepare for SonarQube analysis
+      - task: SonarQubePrepare@4
+        displayName: 'Prepare SonarQube Analysis'
+        inputs:
+          SonarQube: 'Sonar_Connect'
+          scannerMode: 'CLI'
+          configMode: 'manual'
+          cliProjectKey: 'ADAS'
+          cliProjectName: 'ADAS'
+          extraProperties: |
+            sonar.exclusions=**/*.bin
 
-    # Run tests and SonarQube analysis
-    - task: Maven@3
-      displayName: 'Test Run and SonarQube Analysis'
-      inputs:
-        mavenPomFile: 'pom.xml'
-        goals: 'verify sonar:sonar'
-        publishJUnitResults: true
-        testResultsFiles: '**/surefire-reports/TEST-*.xml'
-        javaHomeOption: 'JDKVersion'
-        jdkVersionOption: '1.17'
-        mavenVersionOption: 'Default'
-        mavenOptions: '-Xmx3072m'
-        mavenAuthenticateFeed: false
-        effectivePomSkip: false
+      # Run tests and SonarQube analysis
+      - task: Maven@3
+        displayName: 'Test Run and SonarQube Analysis'
+        inputs:
+          mavenPomFile: 'pom.xml'
+          goals: 'verify sonar:sonar'
+          publishJUnitResults: true
+          testResultsFiles: '**/surefire-reports/TEST-*.xml'
+          javaHomeOption: 'JDKVersion'
+          jdkVersionOption: '1.17'
+          mavenVersionOption: 'Default'
+          mavenOptions: '-Xmx3072m'
+          mavenAuthenticateFeed: false
+          effectivePomSkip: false
 
-    # Build the package
-    - task: Maven@3
-      displayName: 'Maven Build'
-      inputs:
-        mavenPomFile: 'pom.xml'
-        goals: 'package'
-        publishJUnitResults: false
-        javaHomeOption: 'JDKVersion'
-        jdkVersionOption: '1.17'
-        mavenVersionOption: 'Default'
-        mavenOptions: '-Xmx3072m'
-        mavenAuthenticateFeed: false
-        effectivePomSkip: false
-        sonarQubeRunAnalysis: false
+  # Stage 3: Package and Verify Build Output
+  - stage: Package_And_Verify
+    displayName: 'Package and Verify Build Output'
+    dependsOn: Build_And_SonarQube
+    jobs:
+    - job: Package_And_Verify
+      displayName: 'Package and Verify Build Output'
+      steps:
+      # Build the package
+      - task: Maven@3
+        displayName: 'Maven Build'
+        inputs:
+          mavenPomFile: 'pom.xml'
+          goals: 'package'
+          publishJUnitResults: false
+          javaHomeOption: 'JDKVersion'
+          jdkVersionOption: '1.17'
+          mavenVersionOption: 'Default'
+          mavenOptions: '-Xmx3072m'
+          mavenAuthenticateFeed: false
+          effectivePomSkip: false
+          sonarQubeRunAnalysis: false
 
-    # Verify Maven build output
-    - script: |
-        echo "Contents of the target directory after build:"
-        ls -R target
-      displayName: 'List Target Directory Contents'
+      # Verify Maven build output
+      - script: |
+          echo "Contents of the target directory after build:"
+          ls -R target
+        displayName: 'List Target Directory Contents'
 
-    # Copy files to artifact staging directory
-    - task: CopyFiles@2
-      displayName: 'Copy Files to Artifact Staging Directory'
-      inputs:
-        contents: '**/target/**/*'
-        targetFolder: '$(Build.ArtifactStagingDirectory)'
+  # Stage 4: Copy Artifacts and Build Docker Image
+  - stage: Artifact_And_Docker
+    displayName: 'Copy Artifacts and Build Docker Image'
+    dependsOn: Package_And_Verify
+    jobs:
+    - job: Artifact_And_Docker
+      displayName: 'Copy Artifacts and Build Docker Image'
+      steps:
+      # Copy files to artifact staging directory
+      - task: CopyFiles@2
+        displayName: 'Copy Files to Artifact Staging Directory'
+        inputs:
+          contents: '**/target/**/*'
+          targetFolder: '$(Build.ArtifactStagingDirectory)'
 
-    # List contents of artifact staging directory
-    - script: |
-        echo "Contents of $(Build.ArtifactStagingDirectory):"
-        ls -R $(Build.ArtifactStagingDirectory)
-      displayName: 'List Artifact Staging Directory Contents'
-    
-    - task: Docker@2
-      inputs:
-        containerRegistry: 'Docker'
-        repository: 'ptccbdacr'
-        command: 'buildAndPush'
-        Dockerfile: '/Dockerfile'
+      # List contents of artifact staging directory
+      - script: |
+          echo "Contents of $(Build.ArtifactStagingDirectory):"
+          ls -R $(Build.ArtifactStagingDirectory)
+        displayName: 'List Artifact Staging Directory Contents'
 
-    # Publish the artifacts
-    - task: PublishBuildArtifacts@1
-      displayName: 'Publish Build Artifacts'
-      inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'drop'
-        publishLocation: 'Container'
+      # Build Docker image
+      - task: Docker@2
+        displayName: 'Build Docker Image'
+        inputs:
+          containerRegistry: ''
+          repository: 'your-docker-repo/adas-park-assist-app'
+          command: 'build'
+          Dockerfile: 'Dockerfile'
+          tags: |
+            latest
+            $(Build.BuildId)
 
+      # Publish the artifacts
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Build Artifacts'
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: 'drop'
+          publishLocation: 'Container'
 
+# Stage 5: Test Case and Test Run in Codebeamer
 #- stage: Test
 #  displayName: 'Test'
 #  jobs:
