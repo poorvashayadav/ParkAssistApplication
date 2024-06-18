@@ -106,10 +106,12 @@ stages:
   # Stage 4: Copy Artifacts and Build Docker Image
   - stage: Artifact_And_Docker
     displayName: 'Copy Artifacts and Build Docker Image'
-    dependsOn: Package_And_Verify
+    dependsOn: Build_And_SonarQube
     jobs:
     - job: Artifact_And_Docker
       displayName: 'Copy Artifacts and Build Docker Image'
+      pool:
+        vmImage: 'ubuntu-latest'  # Use a Linux-based pool for Docker tasks
       steps:
       # Copy files to artifact staging directory
       - task: CopyFiles@2
@@ -158,5 +160,3 @@ stages:
 #     env:
 #        cb_user: $(cb_user)
 #        cb_password: $(cb_password)
-
-
