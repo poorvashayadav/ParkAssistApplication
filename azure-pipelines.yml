@@ -18,11 +18,13 @@ stages:
     steps:
     - checkout: self  # Ensure the repository is checked out
 
+    # Clean and analyze dependencies
     - script: |
         mvn clean
         mvn dependency:tree
       displayName: 'Clean and Analyze Dependencies'
 
+    # Compile the code
     - task: Maven@3
       displayName: 'Maven Compile'
       inputs:
@@ -36,8 +38,9 @@ stages:
         mavenAuthenticateFeed: false
         effectivePomSkip: false
 
+    # Prepare for SonarQube analysis
     - task: SonarQubePrepare@4
-      displayName: 'SonarQube Analysis'
+      displayName: 'Prepare SonarQube Analysis'
       inputs:
         SonarQube: 'Sonar_Connect'
         scannerMode: 'CLI'
@@ -47,8 +50,9 @@ stages:
         extraProperties: |
           sonar.exclusions=**/*.bin
 
+    # Run tests and SonarQube analysis
     - task: Maven@3
-      displayName: 'Test Run'
+      displayName: 'Test Run and SonarQube Analysis'
       inputs:
         mavenPomFile: 'pom.xml'
         goals: 'verify sonar:sonar'
@@ -60,30 +64,37 @@ stages:
         mavenOptions: '-Xmx3072m'
         mavenAuthenticateFeed: false
         effectivePomSkip: false
-    - task: Maven@4
-      displayName: 'Maven Build Artifact'
+
+    # Build the package
+    - task: Maven@3
+      displayName: 'Maven Build'
       inputs:
         mavenPomFile: 'pom.xml'
         goals: 'package'
         publishJUnitResults: false
         javaHomeOption: 'JDKVersion'
+        jdkVersionOption: '1.17'
         mavenVersionOption: 'Default'
+        mavenOptions: '-Xmx3072m'
         mavenAuthenticateFeed: false
         effectivePomSkip: false
         sonarQubeRunAnalysis: false
-        
+
+    # Copy files to artifact staging directory
     - task: CopyFiles@2
       displayName: 'Copy Files to Artifact Staging Directory'
       inputs:
         contents: '**/target/**/*'
         targetFolder: '$(Build.ArtifactStagingDirectory)'
 
+    # List contents of artifact staging directory
     - script: |
         echo "Contents of $(Build.ArtifactStagingDirectory):"
         ls -R $(Build.ArtifactStagingDirectory)
       displayName: 'List Artifact Staging Directory Contents'
       
   - job: Publish_Build_Artifact
+    displayName: 'Publish Build Artifacts'
     steps:
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Build Artifacts'
