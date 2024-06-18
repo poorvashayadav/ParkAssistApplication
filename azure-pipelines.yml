@@ -106,7 +106,7 @@ stages:
   # Stage 4: Copy Artifacts and Build Docker Image
   - stage: Artifact_And_Docker
     displayName: 'Copy Artifacts and Build Docker Image'
-    dependsOn: Build_And_SonarQube
+    dependsOn: Package_And_Verify  # Corrected dependency to Package_And_Verify stage
     jobs:
     - job: Artifact_And_Docker
       displayName: 'Copy Artifacts and Build Docker Image'
@@ -131,7 +131,7 @@ stages:
         displayName: 'Build Docker Image'
         inputs:
           containerRegistry: ''
-          repository: '/'
+          repository: 'your-docker-repo/adas-park-assist-app'  # Replace with your actual Docker repository
           command: 'build'
           Dockerfile: 'Dockerfile'
           tags: |
