@@ -129,7 +129,7 @@ stages:
         displayName: 'Build Docker Image'
         inputs:
           containerRegistry: ''
-          repository: 'your-docker-repo/adas-park-assist-app'
+          repository: '/'
           command: 'build'
           Dockerfile: 'Dockerfile'
           tags: |
