@@ -98,6 +98,13 @@ stages:
         echo "Contents of $(Build.ArtifactStagingDirectory):"
         ls -R $(Build.ArtifactStagingDirectory)
       displayName: 'List Artifact Staging Directory Contents'
+    
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'Docker'
+        repository: 'ptccbdacr'
+        command: 'buildAndPush'
+        Dockerfile: '/Dockerfile'
 
     # Publish the artifacts
     - task: PublishBuildArtifacts@1
