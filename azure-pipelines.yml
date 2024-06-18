@@ -11,10 +11,10 @@ variables:
   - group: secrets
 
 stages:
-- stage: Maven_And_Sonar_Analysis 
+- stage: Maven_And_Sonar_Analysis
   jobs:
-  - job: Maven_Compile_Job
-    displayName: 'Compile ADAS-Park Assist App Code'
+  - job: Build_And_Publish
+    displayName: 'Build, Analyze, and Publish ADAS-Park Assist App Code'
     steps:
     - checkout: self  # Ensure the repository is checked out
 
@@ -98,16 +98,15 @@ stages:
         echo "Contents of $(Build.ArtifactStagingDirectory):"
         ls -R $(Build.ArtifactStagingDirectory)
       displayName: 'List Artifact Staging Directory Contents'
-      
-  - job: Publish_Build_Artifact
-    displayName: 'Publish Build Artifacts'
-    steps:
+
+    # Publish the artifacts
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Build Artifacts'
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
         ArtifactName: 'drop'
         publishLocation: 'Container'
+
 
 #- stage: Test
 #  displayName: 'Test'
