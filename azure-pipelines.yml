@@ -74,17 +74,9 @@ stages:
           mavenAuthenticateFeed: false
           effectivePomSkip: false
 
-  # Stage 3: Package and Verify Build Output
-  - stage: Package_And_Verify
-    displayName: 'Package and Verify Build Output'
-    dependsOn: Build_And_SonarQube
-    jobs:
-    - job: Package_And_Verify
-      displayName: 'Package and Verify Build Output'
-      steps:
-      # Build the package
+      # Package the application
       - task: Maven@3
-        displayName: 'Maven Build'
+        displayName: 'Package Application'
         inputs:
           mavenPomFile: 'pom.xml'
           goals: 'package'
@@ -97,27 +89,29 @@ stages:
           effectivePomSkip: false
           sonarQubeRunAnalysis: false
 
-      # Verify Maven build output
-      - script: |
-          echo "Contents of the target directory after build:"
-          ls -R target
-        displayName: 'List Target Directory Contents'
+      # Publish the artifacts
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Build Artifacts'
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: 'drop'
+          publishLocation: 'Container'
 
-  # Stage 4: Copy Artifacts and Build Docker Image
+  # Stage 3: Copy Artifacts and Build Docker Image
   - stage: Artifact_And_Docker
     displayName: 'Copy Artifacts and Build Docker Image'
-    dependsOn: Package_And_Verify
+    dependsOn: Build_And_SonarQube
+    pool:
+      vmImage: 'ubuntu-latest'  # Use a Linux-based pool for Docker tasks
     jobs:
     - job: Artifact_And_Docker
       displayName: 'Copy Artifacts and Build Docker Image'
-      pool:
-        vmImage: 'ubuntu-latest'  # Use a Linux-based pool for Docker tasks
       steps:
       # Copy files to artifact staging directory
       - task: CopyFiles@2
         displayName: 'Copy Files to Artifact Staging Directory'
         inputs:
-          contents: 'target/**/*'
+          contents: '$(System.DefaultWorkingDirectory)/target/**/*'
           targetFolder: '$(Build.ArtifactStagingDirectory)'
 
       # List contents of artifact staging directory
@@ -138,13 +132,6 @@ stages:
             latest
             $(Build.BuildId)
 
-      # Publish the artifacts
-      - task: PublishBuildArtifacts@1
-        displayName: 'Publish Build Artifacts'
-        inputs:
-          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-          ArtifactName: 'drop'
-          publishLocation: 'Container'
 
 
 # Stage 5: Test Case and Test Run in Codebeamer
