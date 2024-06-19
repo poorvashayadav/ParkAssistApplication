@@ -106,7 +106,7 @@ stages:
   # Stage 4: Copy Artifacts and Build Docker Image
   - stage: Artifact_And_Docker
     displayName: 'Copy Artifacts and Build Docker Image'
-    dependsOn: Package_And_Verify  # Corrected dependency to Package_And_Verify stage
+    dependsOn: Package_And_Verify
     jobs:
     - job: Artifact_And_Docker
       displayName: 'Copy Artifacts and Build Docker Image'
@@ -117,7 +117,7 @@ stages:
       - task: CopyFiles@2
         displayName: 'Copy Files to Artifact Staging Directory'
         inputs:
-          contents: '**/target/**/*'
+          contents: 'target/**/*'
           targetFolder: '$(Build.ArtifactStagingDirectory)'
 
       # List contents of artifact staging directory
@@ -130,6 +130,7 @@ stages:
       - task: Docker@2
         displayName: 'Build Docker Image'
         inputs:
+          containerRegistry: 'DockerHub'
           repository: 'parkasssist/parkassistrepo'
           command: 'buildAndPush'
           Dockerfile: 'Dockerfile'
@@ -144,6 +145,7 @@ stages:
           PathtoPublish: '$(Build.ArtifactStagingDirectory)'
           ArtifactName: 'drop'
           publishLocation: 'Container'
+
 
 # Stage 5: Test Case and Test Run in Codebeamer
 #- stage: Test
