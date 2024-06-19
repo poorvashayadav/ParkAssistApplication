@@ -131,7 +131,7 @@ stages:
         displayName: 'Build Docker Image'
         inputs:
           containerRegistry: ''
-          repository: 'your-docker-repo/adas-park-assist-app'  # Replace with your actual Docker repository
+          repository: 'parkasssist/parkassistrepo'  # Replace with your actual Docker repository
           command: 'build'
           Dockerfile: 'Dockerfile'
           tags: |
