@@ -130,9 +130,8 @@ stages:
       - task: Docker@2
         displayName: 'Build Docker Image'
         inputs:
-          containerRegistry: ''
-          repository: 'parkasssist/parkassistrepo'  # Replace with your actual Docker repository
-          command: 'build'
+          repository: 'parkasssist/parkassistrepo'
+          command: 'buildAndPush'
           Dockerfile: 'Dockerfile'
           tags: |
             latest
