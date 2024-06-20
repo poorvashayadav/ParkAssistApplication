@@ -15,87 +15,87 @@ stages:
   - stage: Checkout_And_Analyze
     displayName: 'Checkout and Analyze Dependencies'
     jobs:
-    - job: Checkout_And_Analyze
-      displayName: 'Checkout and Analyze Dependencies'
-      steps:
-      - checkout: self  # Ensure the repository is checked out
+      - job: Checkout_And_Analyze
+        displayName: 'Checkout and Analyze Dependencies'
+        steps:
+          - checkout: self  # Ensure the repository is checked out
 
-      - script: |
-          mvn clean
-          mvn dependency:tree
-        displayName: 'Clean and Analyze Dependencies'
+          - script: |
+              mvn clean
+              mvn dependency:tree
+            displayName: 'Clean and Analyze Dependencies'
 
   # Stage 2: Build and SonarQube Analysis
   - stage: Build_And_SonarQube
     displayName: 'Build and SonarQube Analysis'
     dependsOn: Checkout_And_Analyze
     jobs:
-    - job: Build_And_SonarQube
-      displayName: 'Build and SonarQube Analysis'
-      steps:
-      # Compile the code
-      - task: Maven@3
-        displayName: 'Maven Compile'
-        inputs:
-          mavenPomFile: 'pom.xml'
-          goals: 'compile'
-          publishJUnitResults: false
-          javaHomeOption: 'JDKVersion'
-          jdkVersionOption: '1.17'
-          mavenVersionOption: 'Default'
-          mavenOptions: '-Xmx3072m'
-          mavenAuthenticateFeed: false
-          effectivePomSkip: false
+      - job: Build_And_SonarQube
+        displayName: 'Build and SonarQube Analysis'
+        steps:
+          # Compile the code
+          - task: Maven@3
+            displayName: 'Maven Compile'
+            inputs:
+              mavenPomFile: 'pom.xml'
+              goals: 'compile'
+              publishJUnitResults: false
+              javaHomeOption: 'JDKVersion'
+              jdkVersionOption: '1.17'
+              mavenVersionOption: 'Default'
+              mavenOptions: '-Xmx3072m'
+              mavenAuthenticateFeed: false
+              effectivePomSkip: false
 
-      # Prepare for SonarQube analysis
-      - task: SonarQubePrepare@4
-        displayName: 'Prepare SonarQube Analysis'
-        inputs:
-          SonarQube: 'Sonar_Connect'
-          scannerMode: 'CLI'
-          configMode: 'manual'
-          cliProjectKey: 'ADAS'
-          cliProjectName: 'ADAS'
-          extraProperties: |
-            sonar.exclusions=**/*.bin
+          # Prepare for SonarQube analysis
+          - task: SonarQubePrepare@4
+            displayName: 'Prepare SonarQube Analysis'
+            inputs:
+              SonarQube: 'Sonar_Connect'
+              scannerMode: 'CLI'
+              configMode: 'manual'
+              cliProjectKey: 'ADAS'
+              cliProjectName: 'ADAS'
+              extraProperties: |
+                sonar.exclusions=**/*.bin
 
-      # Run tests and SonarQube analysis
-      - task: Maven@3
-        displayName: 'Test Run and SonarQube Analysis'
-        inputs:
-          mavenPomFile: 'pom.xml'
-          goals: 'verify sonar:sonar'
-          publishJUnitResults: true
-          testResultsFiles: '**/surefire-reports/TEST-*.xml'
-          javaHomeOption: 'JDKVersion'
-          jdkVersionOption: '1.17'
-          mavenVersionOption: 'Default'
-          mavenOptions: '-Xmx3072m'
-          mavenAuthenticateFeed: false
-          effectivePomSkip: false
+          # Run tests and SonarQube analysis
+          - task: Maven@3
+            displayName: 'Test Run and SonarQube Analysis'
+            inputs:
+              mavenPomFile: 'pom.xml'
+              goals: 'verify sonar:sonar'
+              publishJUnitResults: true
+              testResultsFiles: '**/surefire-reports/TEST-*.xml'
+              javaHomeOption: 'JDKVersion'
+              jdkVersionOption: '1.17'
+              mavenVersionOption: 'Default'
+              mavenOptions: '-Xmx3072m'
+              mavenAuthenticateFeed: false
+              effectivePomSkip: false
 
-      # Package the application
-      - task: Maven@3
-        displayName: 'Package Application'
-        inputs:
-          mavenPomFile: 'pom.xml'
-          goals: 'package'
-          publishJUnitResults: false
-          javaHomeOption: 'JDKVersion'
-          jdkVersionOption: '1.17'
-          mavenVersionOption: 'Default'
-          mavenOptions: '-Xmx3072m'
-          mavenAuthenticateFeed: false
-          effectivePomSkip: false
-          sonarQubeRunAnalysis: false
+          # Package the application
+          - task: Maven@3
+            displayName: 'Package Application'
+            inputs:
+              mavenPomFile: 'pom.xml'
+              goals: 'package'
+              publishJUnitResults: false
+              javaHomeOption: 'JDKVersion'
+              jdkVersionOption: '1.17'
+              mavenVersionOption: 'Default'
+              mavenOptions: '-Xmx3072m'
+              mavenAuthenticateFeed: false
+              effectivePomSkip: false
+              sonarQubeRunAnalysis: false
 
-      # Publish the artifacts
-      - task: PublishBuildArtifacts@1
-        displayName: 'Publish Build Artifacts'
-        inputs:
-          PathtoPublish: '$(System.DefaultWorkingDirectory)/target'
-          ArtifactName: 'drop'
-          publishLocation: 'Container'
+          # Publish the artifacts
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish Build Artifacts'
+            inputs:
+              PathtoPublish: '$(System.DefaultWorkingDirectory)/target'
+              ArtifactName: 'drop'
+              publishLocation: 'Container'
 
   # Stage 3: Copy Artifacts and Build Docker Image
   - stage: Artifact_And_Docker
@@ -104,46 +104,45 @@ stages:
     pool:
       vmImage: 'ubuntu-latest'  # Use a Linux-based pool for Docker tasks
     jobs:
-    - job: Artifact_And_Docker
-      displayName: 'Copy Artifacts and Build Docker Image'
-      steps:
-      # Download the artifacts
-      - task: DownloadPipelineArtifact@2
-        displayName: 'Download Build Artifacts'
-        inputs:
-          artifact: 'drop'
+      - job: Artifact_And_Docker
+        displayName: 'Copy Artifacts and Build Docker Image'
+        steps:
+          # Download the artifacts
+          - task: DownloadPipelineArtifact@2
+            displayName: 'Download Build Artifacts'
+            inputs:
+              artifact: 'drop'
 
-      # List contents of artifact staging directory
-      - script: |
-          echo "Contents of $(Build.ArtifactStagingDirectory):"
-          ls -R $(Build.ArtifactStagingDirectory)
-        displayName: 'List Artifact Staging Directory Contents'
+          # List contents of artifact staging directory
+          - script: |
+              echo "Contents of $(Build.ArtifactStagingDirectory):"
+              ls -R $(Build.ArtifactStagingDirectory)
+            displayName: 'List Artifact Staging Directory Contents'
 
-      # Build Docker image
-      - task: Docker@2
-        displayName: 'Build Docker Image'
-        inputs:
-          containerRegistry: 'DockerHub'
-          repository: 'parkasssist/parkassistrepo'
-          command: 'buildAndPush'
-          Dockerfile: 'Dockerfile'
-          tags: |
-            latest
-            $(Build.BuildId)
+          # Build Docker image
+          - task: Docker@2
+            displayName: 'Build Docker Image'
+            inputs:
+              containerRegistry: 'DockerHub'
+              repository: 'parkasssist/parkassistrepo'
+              command: 'buildAndPush'
+              Dockerfile: 'Dockerfile'
+              tags: |
+                latest
+                $(Build.BuildId)
 
+  # Stage 4: Test Case and Test Run in Codebeamer
+  - stage: Test
+    displayName: 'Test'
+    jobs:
+      - job: RunPythonScript
+        displayName: 'Run Python Script'
+        steps:
+          - checkout: self  # Ensure the repository is checked out
 
-
-# Stage 5: Test Case and Test Run in Codebeamer
-#- stage: Test
-#  displayName: 'Test'
-#  jobs:
-#  - job: RunPythonScript
-#    steps:
-#    - checkout: self  # Ensure the repository is checked out
-#
-#    - script: |
-#        python CodeBeamer/test_results/uploadtestcases.py
-#      displayName: 'Run Python Script'
-#     env:
-#        cb_user: $(cb_user)
-#        cb_password: $(cb_password)
+          - script: |
+              python CodeBeamer/test_results/uploadtestcases.py
+            displayName: 'Run Python Script'
+            env:
+              cb_user: $(cb_user)
+              cb_password: $(cb_password)
