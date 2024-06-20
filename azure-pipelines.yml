@@ -93,7 +93,7 @@ stages:
       - task: PublishBuildArtifacts@1
         displayName: 'Publish Build Artifacts'
         inputs:
-          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          PathtoPublish: '$(System.DefaultWorkingDirectory)/target'
           ArtifactName: 'drop'
           publishLocation: 'Container'
 
@@ -107,12 +107,11 @@ stages:
     - job: Artifact_And_Docker
       displayName: 'Copy Artifacts and Build Docker Image'
       steps:
-      # Copy files to artifact staging directory
-      - task: CopyFiles@2
-        displayName: 'Copy Files to Artifact Staging Directory'
+      # Download the artifacts
+      - task: DownloadPipelineArtifact@2
+        displayName: 'Download Build Artifacts'
         inputs:
-          contents: '$(System.DefaultWorkingDirectory)/target/**/*'
-          targetFolder: '$(Build.ArtifactStagingDirectory)'
+          artifact: 'drop'
 
       # List contents of artifact staging directory
       - script: |
