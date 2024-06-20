@@ -126,7 +126,7 @@ stages:
           containerRegistry: 'DockerHub'
           repository: 'parkasssist/parkassistrepo'
           command: 'buildAndPush'
-          Dockerfile: 'Dockerfile'
+          Dockerfile: '$(Build.ArtifactStagingDirectory)/Dockerfile'
           tags: |
             latest
             $(Build.BuildId)
