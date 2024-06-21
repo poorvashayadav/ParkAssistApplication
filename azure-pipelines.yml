@@ -89,12 +89,23 @@ stages:
               effectivePomSkip: false
               sonarQubeRunAnalysis: false
 
-          # Publish the artifacts
-          - task: PublishBuildArtifacts@1
-            displayName: 'Publish Build Artifacts'
+          # Zip the artifacts
+          - task: PowerShell@2
+            displayName: 'Zip Maven Artifacts'
             inputs:
-              PathtoPublish: '$(System.DefaultWorkingDirectory)/target'
-              ArtifactName: 'drop'
+              targetType: 'inline'
+              script: |
+                $outputPath = "$(Build.ArtifactStagingDirectory)/maven_artifacts.zip"
+                Add-Type -AssemblyName System.IO.Compression.FileSystem
+                [System.IO.Compression.ZipFile]::CreateFromDirectory("$(System.DefaultWorkingDirectory)/target", $outputPath)
+                Write-Output "Artifacts zipped to $outputPath"
+
+          # Publish the zipped artifacts
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish Zipped Build Artifacts'
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)/maven_artifacts.zip'
+              ArtifactName: 'maven_artifacts'
               publishLocation: 'Container'
 
   # Stage 3: Copy Artifacts and Build Docker Image
@@ -111,7 +122,7 @@ stages:
           - task: DownloadPipelineArtifact@2
             displayName: 'Download Build Artifacts'
             inputs:
-              artifact: 'drop'
+              artifact: 'maven_artifacts'
 
           # List contents of artifact staging directory
           - script: |
@@ -119,19 +130,34 @@ stages:
               ls -R $(Build.ArtifactStagingDirectory)
             displayName: 'List Artifact Staging Directory Contents'
 
-          # Build Docker image
+          # Build Docker image with the custom tag
           - task: Docker@2
-            displayName: 'Build Docker Image'
+            displayName: 'Build and Push Docker Image'
             inputs:
               containerRegistry: 'DockerHub'
               repository: 'parkasssist/parkassistrepo'
               command: 'buildAndPush'
               Dockerfile: 'Dockerfile'
               tags: |
-                latest
-                $(Build.BuildId)
+                $(tagName)  # Adding the custom tag name to the Docker image
 
-  # Stage 4: Test Case and Test Run in Codebeamer
+  # Stage 4: Tag the Repository
+  - stage: Tag_Repository
+    displayName: 'Tag Repository'
+    dependsOn: Build_And_SonarQube
+    jobs:
+      - job: Tag
+        displayName: 'Tag the Repository'
+        steps:
+          - checkout: self  # Ensure the repository is checked out
+
+          - script: |
+              git tag $(tagName)
+              git push origin $(tagName)
+              echo 'Tag $(tagName) created and pushed.'
+            displayName: 'Create and Push Git Tag'
+
+  # Stage 5: Test Case and Test Run in Codebeamer
   - stage: Test
     displayName: 'Test'
     jobs:
@@ -146,3 +172,11 @@ stages:
             env:
               cb_user: $(cb_user)
               cb_password: $(cb_password)
+
+# Add a new step to tag the pipeline run
+- task: PowerShell@2
+  displayName: 'Tag the pipeline run'
+  inputs:
+    targetType: 'inline'
+    script: |
+      Write-Output "##vso[build.addbuildtag]$(tagName)"
