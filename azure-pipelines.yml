@@ -8,7 +8,7 @@ pool:
   vmImage: 'windows-2019'
 
 variables:
-  - group: secrets
+  - group: secrets  
 
 stages:
   # Stage 1: Checkout and Dependency Analysis
@@ -140,7 +140,7 @@ stages:
               Dockerfile: 'Dockerfile'
               tags: |
                 $(tagName)  # Adding the custom tag name to the Docker image
-
+          
   # Stage 4: Tag the Repository
   - stage: Tag_Repository
     displayName: 'Tag Repository'
@@ -156,6 +156,13 @@ stages:
               git push origin $(tagName)
               echo 'Tag $(tagName) created and pushed.'
             displayName: 'Create and Push Git Tag'
+            # Add a new step to tag the pipeline run
+          - task: PowerShell@2
+            displayName: 'Tag the pipeline run'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Output "##vso[build.addbuildtag]$(tagName)"
 
   # Stage 5: Test Case and Test Run in Codebeamer
   - stage: Test
@@ -173,10 +180,4 @@ stages:
               cb_user: $(cb_user)
               cb_password: $(cb_password)
 
-# Add a new step to tag the pipeline run
-- task: PowerShell@2
-  displayName: 'Tag the pipeline run'
-  inputs:
-    targetType: 'inline'
-    script: |
-      Write-Output "##vso[build.addbuildtag]$(tagName)"
+          
