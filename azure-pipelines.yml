@@ -139,8 +139,8 @@ stages:
               command: 'buildAndPush'
               Dockerfile: 'Dockerfile'
               tags: |
-                $(tagName)  # Adding the custom tag name to the Docker image
-          
+                $(tagName)  # Ensure this tag is correctly formatted and valid
+
   # Stage 4: Tag the Repository
   - stage: Tag_Repository
     displayName: 'Tag Repository'
@@ -156,7 +156,8 @@ stages:
               git push origin $(tagName)
               echo 'Tag $(tagName) created and pushed.'
             displayName: 'Create and Push Git Tag'
-            # Add a new step to tag the pipeline run
+        
+          # Add a new step to tag the pipeline run
           - task: PowerShell@2
             displayName: 'Tag the pipeline run'
             inputs:
@@ -179,5 +180,3 @@ stages:
             env:
               cb_user: $(cb_user)
               cb_password: $(cb_password)
-
-          
