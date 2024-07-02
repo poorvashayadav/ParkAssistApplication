@@ -1,0 +1,5 @@
+{
+  "name": "This test case ensures that the vehicle can detect and respond to moving objects entering the path during the parking maneuver, such as pedestrians or bicycles.",
+  "tracker": "/project/39/tracker/98809",
+  
+}
