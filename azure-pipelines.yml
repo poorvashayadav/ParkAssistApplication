@@ -48,31 +48,31 @@ stages:
               effectivePomSkip: false
 
           # Prepare for SonarQube analysis
-          # - task: SonarQubePrepare@4
-          #   displayName: 'Prepare SonarQube Analysis'
-          #   inputs:
-          #     SonarQube: 'Sonar_Connect'
-          #     scannerMode: 'CLI'
-          #     configMode: 'manual'
-          #     cliProjectKey: 'ADAS'
-          #     cliProjectName: 'ADAS'
-          #     extraProperties: |
-          #       sonar.exclusions=**/*.bin
+          - task: SonarQubePrepare@4
+            displayName: 'Prepare SonarQube Analysis'
+            inputs:
+              SonarQube: 'Sonar_Connect'
+              scannerMode: 'CLI'
+              configMode: 'manual'
+              cliProjectKey: 'ADAS'
+              cliProjectName: 'ADAS'
+              extraProperties: |
+                sonar.exclusions=**/*.bin
 
           # Run tests and SonarQube analysis
-          # - task: Maven@3
-          #   displayName: 'Test Run and SonarQube Analysis'
-          #   inputs:
-          #     mavenPomFile: 'pom.xml'
-          #     goals: 'verify sonar:sonar'
-          #     publishJUnitResults: true
-          #     testResultsFiles: '**/surefire-reports/TEST-*.xml'
-          #     javaHomeOption: 'JDKVersion'
-          #     jdkVersionOption: '1.17'
-          #     mavenVersionOption: 'Default'
-          #     mavenOptions: '-Xmx3072m'
-          #     mavenAuthenticateFeed: false
-          #     effectivePomSkip: false
+          - task: Maven@3
+            displayName: 'Test Run and SonarQube Analysis'
+            inputs:
+              mavenPomFile: 'pom.xml'
+              goals: 'verify sonar:sonar'
+              publishJUnitResults: true
+              testResultsFiles: '**/surefire-reports/TEST-*.xml'
+              javaHomeOption: 'JDKVersion'
+              jdkVersionOption: '1.17'
+              mavenVersionOption: 'Default'
+              mavenOptions: '-Xmx3072m'
+              mavenAuthenticateFeed: false
+              effectivePomSkip: false
 
           # Package the application
           - task: Maven@3
@@ -139,33 +139,9 @@ stages:
               command: 'buildAndPush'
               Dockerfile: 'Dockerfile'
               tags: |
-                $(tagName)  # Ensure this tag is correctly formatted and valid
+                $(appVersion)-latest  # Ensure this tag is correctly formatted and valid
 
-  # Stage 4: Tag the Repository
-  - stage: Tag_Repository
-    displayName: 'Tag Repository'
-    dependsOn: Build_And_SonarQube
-    jobs:
-      - job: Tag
-        displayName: 'Tag the Repository'
-        steps:
-          - checkout: self  # Ensure the repository is checked out
-
-          - script: |
-              git tag $(tagName)
-              git push origin $(tagName)
-              echo 'Tag $(tagName) created and pushed.'
-            displayName: 'Create and Push Git Tag'
-        
-          # Add a new step to tag the pipeline run
-          - task: PowerShell@2
-            displayName: 'Tag the pipeline run'
-            inputs:
-              targetType: 'inline'
-              script: |
-                Write-Output "##vso[build.addbuildtag]$(tagName)"
-
-  # Stage 5: Test Case and Test Run in Codebeamer
+  # Stage 4: Test Case and Test Run in Codebeamer
   - stage: Test
     displayName: 'Test'
     jobs:
