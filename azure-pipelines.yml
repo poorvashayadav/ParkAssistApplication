@@ -139,7 +139,7 @@ stages:
               command: 'buildAndPush'
               Dockerfile: 'Dockerfile'
               tags: |
-                $(appVersion)-latest  # Ensure this tag is correctly formatted and valid
+                $(appVersion)-latest
 
   # Stage 4: Test Case and Test Run in Codebeamer
   - stage: Test
