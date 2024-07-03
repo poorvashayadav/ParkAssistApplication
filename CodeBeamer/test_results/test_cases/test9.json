@@ -1,5 +1,4 @@
 {
   "name": "This test case ensures that the vehicle can detect when any door is opened during any phase of the parking maneuver (e.g., initial positioning, final adjustments).",
   "tracker": "/project/39/tracker/98809"
-  
 }
