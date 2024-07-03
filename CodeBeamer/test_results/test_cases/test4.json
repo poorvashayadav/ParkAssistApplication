@@ -1,5 +1,5 @@
 {
   "name": "This test case ensures that the vehicle can handle parking in spaces that are slightly smaller than average (e.g., 6 meters long) and it evaluates the vehicle's ability to detect a tight parking space."
-  "tracker": "/project/39/tracker/98809",
+  "tracker": "/project/39/tracker/98809"
   
 }
