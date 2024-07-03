@@ -1,5 +1,4 @@
 {
   "name": "This test case verifies that the vehicle's automated parking system can detect objects in the path during both the initial phase (e.g., vehicle positioning) and final phase (e.g., final adjustments) of the parking maneuver.",
   "tracker": "/project/39/tracker/98809"
-  
 }
