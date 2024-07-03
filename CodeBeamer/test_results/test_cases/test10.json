@@ -1,5 +1,5 @@
 {
   "name": "This test case ensures that the vehicle can handle parking in spaces that are slightly smaller than average (slightly narrower or shorter than standard, e.g., 9 feet wide by 18 feet long) and also it evaluates the vehicle's ability to detect a tight perpendicular parking space park within the designated lines.",
-  "tracker": "/project/39/tracker/98809",
+  "tracker": "/project/39/tracker/98809"
   
 }
