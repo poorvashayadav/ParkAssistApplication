@@ -4,6 +4,8 @@ import urllib.request
 from urllib.error import HTTPError, URLError
 import base64
 import platform
+import gzip  # Import gzip module
+import io  # Import io module for handling compressed responses
 
 # Determine the correct path based on the operating system and environment
 if platform.system() == 'Windows':
