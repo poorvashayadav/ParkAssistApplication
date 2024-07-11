@@ -5,7 +5,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 class ParkAssistApplicationTests {
-
+ 
 	@Test
 	void contextLoads() {
 	// This is a fake test case with no logic(Test 1)
