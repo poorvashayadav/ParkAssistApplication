@@ -19,5 +19,11 @@ WORKDIR /app
 # Copy the JAR file from the build stage
 COPY --from=build /app/target/ParkAssist-0.0.1-SNAPSHOT.jar /app/ParkAssist-0.0.1-SNAPSHOT.jar
 
+# Print the Java version to ensure Java is available
+RUN java -version
+
+# List files in the working directory to verify the JAR file is present
+RUN ls -lh /app
+
 # Run the application
-ENTRYPOINT ["java", "-jar", "ParkAssist-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-jar", "/app/ParkAssist-0.0.1-SNAPSHOT.jar"]
