@@ -140,6 +140,7 @@ stages:
               Dockerfile: 'Dockerfile'
               tags: |
                 $(appVersion)-latest
+                latest
 
   # Stage 4: Test Case and Test Run in Codebeamer
   - stage: Test
