@@ -25,5 +25,11 @@ RUN java -version
 # List files in the working directory to verify the JAR file is present
 RUN ls -lh /app
 
+# Expose port 80
+EXPOSE 80
+
+# Add healthcheck
+HEALTHCHECK --interval=30s --timeout=10s --retries=5 CMD curl -f http://localhost/ || exit 1
+
 # Run the application
 ENTRYPOINT ["java", "-jar", "/app/ParkAssist-0.0.1-SNAPSHOT.jar"]
