@@ -139,7 +139,7 @@ stages:
               command: 'buildAndPush'
               Dockerfile: 'Dockerfile'
               tags: |
-                $(appVersion)-latest
+                $(Build.BuildId)
                 latest
 
   # Stage 4: Test Case and Test Run in Codebeamer
@@ -157,3 +157,4 @@ stages:
             env:
               cb_user: $(cb_user)
               cb_password: $(cb_password)
+#                $(appVersion)-latest
