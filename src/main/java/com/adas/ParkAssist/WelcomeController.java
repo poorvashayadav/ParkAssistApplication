@@ -67,6 +67,11 @@ public class WelcomeController {
                "<p>New Feature: <span class=\"highlight\">Enhanced Parking Safety: Stop on Object Detection</span>.</p>" +
                "<p>This feature will halt the parking maneuver when an object is detected, ensuring the vehicle does not collide with any obstacles.</p>" +
                "</div>" +
+               "<div class=\"change-request\">" +
+               "<h2>Change Request 3</h2>" +
+               "<p>New Feature: <span class=\"highlight\">Smart Perpendicular Parking Assist</span>.</p>" +
+               "<p>This feature enhances the system's ability to park perpendicularly, making parking in tight spots easier and safer.</p>" +
+               "</div>" +
                "</div>" +
                "</body>" +
                "</html>";
