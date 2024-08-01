@@ -50,6 +50,10 @@ public class WelcomeController {
                "    border-radius: 8px; " +
                "    border: 1px solid #c4e1c1; " +
                "} " +
+               ".bug-request { " +
+               "    background: #fbe8e8; " +
+               "    border: 1px solid #f5c6c6; " +
+               "} " +
                "</style>" +
                "</head>" +
                "<body>" +
@@ -71,6 +75,18 @@ public class WelcomeController {
                "<h2>Change Request 3</h2>" +
                "<p>New Feature: <span class=\"highlight\">Smart Perpendicular Parking Assist</span>.</p>" +
                "<p>This feature enhances the system's ability to park perpendicularly, making parking in tight spots easier and safer.</p>" +
+               "</div>" +
+               "<div class=\"bug-request\">" +
+               "<h2>Bug Requests</h2>" +
+               "<h3>[BUG-27389]</h3>" +
+               "<p>Issue: <span class=\"highlight\">The system should immediately stop the parking maneuver if an object is detected in the vehicle's path</span>.</p>" +
+               "<p>This bug involves the failure of the parking assist system to halt when an obstacle is detected, which can lead to potential accidents or damage.</p>" +
+               "<h3>[BUG-27385]</h3>" +
+               "<p>Issue: <span class=\"highlight\">The vehicle does not stop parking when a door opens, posing a safety risk</span>.</p>" +
+               "<p>There is a critical bug where the parking process continues even if a door is opened, which could result in safety hazards. This issue requires immediate attention.</p>" +
+               "<h3>[BUG-27393]</h3>" +
+               "<p>Issue: <span class=\"highlight\">The system does not currently halt perpendicular parking when a door opens during adjustments</span>.</p>" +
+               "<p>There is a bug where the vehicle continues to adjust itself during perpendicular parking even if a door opens. This poses a safety risk and needs to be addressed immediately to prevent potential accidents.</p>" +
                "</div>" +
                "</div>" +
                "</body>" +
