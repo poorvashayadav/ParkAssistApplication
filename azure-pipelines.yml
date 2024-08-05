@@ -142,17 +142,17 @@ stages:
                 latest
 
   # Stage 4: Test Case and Test Run in Codebeamer
-  - stage: Test
-    displayName: 'Test'
-    jobs:
-      - job: RunPythonScript
-        displayName: 'Run Python Script'
-        steps:
-          - checkout: self  # Ensure the repository is checked out
+  # - stage: Test
+  #   displayName: 'Test'
+  #   jobs:
+  #     - job: RunPythonScript
+  #       displayName: 'Run Python Script'
+  #       steps:
+  #         - checkout: self  # Ensure the repository is checked out
 
-          - script: |
-              python CodeBeamer/test_results/uploadtestcases.py
-            displayName: 'Run Python Script'
-            env:
-              cb_user: $(cb_user)
-              cb_password: $(cb_password)
+  #         - script: |
+  #             python CodeBeamer/test_results/uploadtestcases.py
+  #           displayName: 'Run Python Script'
+  #           env:
+  #             cb_user: $(cb_user)
+  #             cb_password: $(cb_password)
