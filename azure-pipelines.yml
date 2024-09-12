@@ -25,13 +25,13 @@ stages:
               mvn dependency:tree
             displayName: 'Clean and Analyze Dependencies'
 
-  # Stage 2: Build and SonarQube Analysis
-  - stage: Build_And_SonarQube
-    displayName: 'Build and SonarQube Analysis'
+  # Stage 2: Build
+  - stage: Build
+    displayName: 'Build Application'
     dependsOn: Checkout_And_Analyze
     jobs:
-      - job: Build_And_SonarQube
-        displayName: 'Build and SonarQube Analysis'
+      - job: Build
+        displayName: 'Build Application'
         steps:
           # Compile the code
           - task: Maven@3
@@ -47,32 +47,33 @@ stages:
               mavenAuthenticateFeed: false
               effectivePomSkip: false
 
-          # Prepare for SonarQube analysis
-          - task: SonarQubePrepare@4
-            displayName: 'Prepare SonarQube Analysis'
-            inputs:
-              SonarQube: 'Sonar_Connect'
-              scannerMode: 'CLI'
-              configMode: 'manual'
-              cliProjectKey: 'ADAS'
-              cliProjectName: 'ADAS'
-              extraProperties: |
-                sonar.exclusions=**/*.bin
+          # Commented out SonarQube tasks
+          # # Prepare for SonarQube analysis
+          # - task: SonarQubePrepare@4
+          #   displayName: 'Prepare SonarQube Analysis'
+          #   inputs:
+          #     SonarQube: 'Sonar_Connect'
+          #     scannerMode: 'CLI'
+          #     configMode: 'manual'
+          #     cliProjectKey: 'ADAS'
+          #     cliProjectName: 'ADAS'
+          #     extraProperties: |
+          #       sonar.exclusions=**/*.bin
 
-          # Run tests and SonarQube analysis
-          - task: Maven@3
-            displayName: 'Test Run and SonarQube Analysis'
-            inputs:
-              mavenPomFile: 'pom.xml'
-              goals: 'verify sonar:sonar'
-              publishJUnitResults: true
-              testResultsFiles: '**/surefire-reports/TEST-*.xml'
-              javaHomeOption: 'JDKVersion'
-              jdkVersionOption: '1.17'
-              mavenVersionOption: 'Default'
-              mavenOptions: '-Xmx3072m'
-              mavenAuthenticateFeed: false
-              effectivePomSkip: false
+          # # Run tests and SonarQube analysis
+          # - task: Maven@3
+          #   displayName: 'Test Run and SonarQube Analysis'
+          #   inputs:
+          #     mavenPomFile: 'pom.xml'
+          #     goals: 'verify sonar:sonar'
+          #     publishJUnitResults: true
+          #     testResultsFiles: '**/surefire-reports/TEST-*.xml'
+          #     javaHomeOption: 'JDKVersion'
+          #     jdkVersionOption: '1.17'
+          #     mavenVersionOption: 'Default'
+          #     mavenOptions: '-Xmx3072m'
+          #     mavenAuthenticateFeed: false
+          #     effectivePomSkip: false
 
           # Package the application
           - task: Maven@3
@@ -110,7 +111,7 @@ stages:
   # Stage 3: Copy Artifacts and Build Docker Image
   - stage: Artifact_And_Docker
     displayName: 'Copy Artifacts and Build Docker Image'
-    dependsOn: Build_And_SonarQube
+    dependsOn: Build
     pool:
       vmImage: 'ubuntu-latest'  # Use a Linux-based pool for Docker tasks
     jobs:
@@ -142,17 +143,17 @@ stages:
                 latest
 
   # Stage 4: Test Case and Test Run in Codebeamer
-  # - stage: Test
-  #   displayName: 'Test'
-  #   jobs:
-  #     - job: RunPythonScript
-  #       displayName: 'Run Python Script'
-  #       steps:
-  #         - checkout: self  # Ensure the repository is checked out
+  - stage: Test
+    displayName: 'Test'
+    jobs:
+      - job: RunPythonScript
+        displayName: 'Run Python Script'
+        steps:
+          - checkout: self  # Ensure the repository is checked out
 
-  #         - script: |
-  #             python CodeBeamer/test_results/uploadtestcases.py
-  #           displayName: 'Run Python Script'
-  #           env:
-  #             cb_user: $(cb_user)
-  #             cb_password: $(cb_password)
+          - script: |
+              python CodeBeamer/test_results/uploadtestcases.py
+            displayName: 'Run Python Script'
+            env:
+              cb_user: $(cb_user)
+              cb_password: $(cb_password)
